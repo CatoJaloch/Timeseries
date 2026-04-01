@@ -282,6 +282,11 @@ random.shuffle(letters)
 letrs = [a for a in letters if a!='C']
 print(letters,letrs) 
 
+#getting all nums from a string
+
+
+
+
 
 
 
