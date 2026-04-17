@@ -1,16 +1,310 @@
-Variety Predictability analysis over 
+#  Time Series Forecast Evaluation Project 
 
-#Checked weeks available...45-2025 to 11-2026 ---19 weeks
+## Project Overview
 
-Data cleaning--removal of unwanted rows,sorting out null and negative values
+This project focuses on evaluating and understanding **forecast unpredictability** in agricultural yield data across two farms: **Sian** and **GTF**.
 
-Data Aggregation and grouping---formation of new columns and new tables
+The primary objective is to:
 
-  -Creation on weekly tables to make it a time series
-  
-Computing mean absolute error and percentage accuracy
-Grouping the varieties per week based on which has lowest predictability on that week 
-  
+* Identify **which varieties are most unpredictable**
+* Distinguish between **consistent vs occasional errors**
+* Compare **forecast performance across farms**
+* Lay groundwork for investigating **possible causes (e.g., environmental factors)**
+
+-----
+
+##  Data Sources
+
+### 1. Variety-Level Time Series Data
+
+Contains weekly records of:
+
+* `variety_name`, `variety_id`
+* `field`
+* `week_number`, `date`
+* `field_forecasts`
+* `field_harvests`
+* precomputed error fields (not used directly)
+
+### 2. Field-Level Data
+
+Contains:
+
+* `area_msqr`, `bed_number`
+* `location` (polygon coordinates)
+* `type` (spray/standard)
+
+---
+
+##  Step 1 — Data Cleaning
+
+* Removed rows where:
+
+  * `field_harvests == 0`
+  * `field_forecasts == 0`
+
+**Reason:**
+
+* Avoid division errors
+* Prevent distortion of percentage-based metrics
+
+---
+
+## Step 2 — Data Preparation
+
+* Selected only relevant columns:
+
+  * week, variety, forecasts, harvests, forecast type
+* Standardized column names (lowercase, stripped spaces)
+* Converted `week_number` to numeric
+
+---
+
+## Step 3 — Seasonal Time Ordering
+
+Weeks were reordered to reflect the **harvest cycle**, not calendar order:
+
+```
+[45 → 52 → 1 → 11]
+```
+
+**Reason:**
+
+* Ensures proper time series continuity across year boundary
+
+---
+
+## Step 4 — Weekly Dataset Creation
+
+* Split dataset into **weekly CSV files**
+* Each file represents one week of observations
+
+Output folder:
+
+```
+sian_weekly_outputs/
+```
+
+---
+
+## Step 5 — Error Metric Computation
+
+For each weekly dataset:
+
+### 1. Percentage Error
+
+```
+(forecast - harvest) / harvest
+```
+
+### 2. Absolute Percentage Error
+
+* Removes direction (focus on magnitude)
+
+### 3. Weighted Absolute Percentage Error
+
+```
+abs_perc_error × field_harvests
+```
+
+**Purpose of weighting:**
+
+* Ensures high-volume fields have greater influence
+* Prevents small harvests from distorting results
+
+---
+
+##  Step 6 — Weekly Unpredictability Ranking
+
+* Sorted varieties by:
+
+  * `weighted_abs_perc_error` (descending)
+* Assigned:
+
+  * `unpredictability_rank`
+
+**Interpretation:**
+
+* Rank 1 = most unpredictable for that week
+
+---
+
+## Step 7 — Weekly Top 6 Extraction
+
+For each week:
+
+* Selected top 6 most unpredictable varieties
+* Saved:
+
+  * CSV (combined)
+  * Horizontal bar chart
+
+Output:
+
+```
+sian_weekly_plots/
+    ├── week_X.png
+    └── sian_top6.csv
+```
+
+---
+
+##  Step 8 — Overall Weighted Error per Variety
+
+Computed across all weeks:
+
+### Formula:
+
+```
+Σ(abs_perc_error × harvest) / Σ(harvest)
+```
+
+Generated:
+
+```
+sian_overall_rank.csv
+```
+
+**Purpose:**
+
+* Provides overall unpredictability score per variety
+
+---
+
+##  Step 9 — Repeat Offender Analysis
+
+From `sian_top6.csv`:
+
+Computed:
+
+* `weeks_in_top6` → frequency of appearance
+* `avg_weighted_error` → severity of error
+
+Generated:
+
+```
+sian_repeat_offenders.csv
+gtf_repeat_offenders.csv
+```
+
+---
+
+##  Step 10 — Key Analytical Dimensions
+
+### 1. Frequency
+
+* How often a variety appears in top 6
+
+### 2. Severity
+
+* Average weighted error magnitude
+
+
+
+##  Step 11 — Unpredictability Classification
+
+Varieties categorized into:
+
+###  Chronic Unpredictable
+
+* High frequency
+* Moderate-to-high error
+
+###  High-Impact Risk
+
+* Low frequency
+* Very high error (outliers)
+
+### Moderate Risk
+
+* Mid frequency and error
+
+### Stable
+
+* Low frequency, low error
+
+
+
+##  Step 12 — Farm Comparison (Sian vs GTF)
+
+### GTF:
+
+* Higher frequency of repeat offenders
+* Much higher error magnitudes
+* Presence of extreme outliers
+
+ Indicates **high volatility system**
+
+---
+
+### Sian:
+
+* Moderate frequency
+* Lower error magnitudes
+* More consistent behavior
+
+ Indicates **controlled but persistent instability**
+
+---
+
+##  Key Findings
+
+* Unpredictability is **variety-specific**, not uniform
+* Two major patterns observed:
+
+  * Chronic instability (frequent moderate errors)
+  * Shock events(rare extreme errors)
+* GTF exhibits greater volatility than Sian
+* Sian shows **more stable but consistent forecasting deviations**
+
+---
+
+## Limitations
+
+* No environmental variables included:
+
+  * weather (rainfall, temperature)
+  * soil conditions
+  * pest/disease data
+
+Limits ability to explain *causal factors*
+
+---
+
+##  Next Steps
+
+### 1. Integrate Weather Data
+
+* Temperature
+* Humidity
+
+### 2. Correlation Analysis
+
+* Compare weather variables with error spikes
+
+### 3. Temporal Pattern Analysis
+
+* Identify weeks with consistent error spikes
+
+### 4. Field-Level Analysis
+
+* Same variety across different fields
+
+---
+
+##  Conclusion
+
+This project successfully:
+
+* Quantifies unpredictability using weighted metrics
+* Identifies consistently unreliable varieties
+* Differentiates between frequency and severity of errors
+* Reveals structural differences between farms
+
+
+
+
+
 
 
 
