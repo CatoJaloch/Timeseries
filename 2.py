@@ -3,17 +3,18 @@ import os
 
 # --- Clean source data: remove zero-harvest and zero-forecast rows ---
 
-df = pd.read_csv('sian_variety.csv')
+df = pd.read_csv('gtf_variety.csv')
 df.drop(df[df["field_harvests"] == 0].index, inplace=True)
 df.drop(df[df["field_forecasts"] == 0].index, inplace=True)
-df.to_csv('sian_variety.csv', index=False)
+df.to_csv('gtf_variety.csv', index=False)
 
 week_numbers = df['week_number'].unique()
-print("Available week numbers Sian:", week_numbers)
+print("Available week numbers GTF:", week_numbers)
 
 
-# --- Load and prepare Sian data ---
+# --- Load and prepare GTF data ---
 # Only the columns needed for weighted error calculations are carried
+# into the weekly outputs — the full source file remains untouched.
 
 def process_file(file_name, farm_name):
     df = pd.read_csv(file_name)
@@ -30,23 +31,23 @@ def process_file(file_name, farm_name):
     return df
 
 
-df_sian = process_file("sian_variety.csv", "sian_variety")
+df_gtf = process_file("gtf_variety.csv", "gtf_variety")
 
 # Season spans two calendar years — ordering must follow harvest cycle,
 # not ascending calendar order
 week_order = [45, 46, 47, 48, 49, 50, 51, 52,
               1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11]
 
-df_sian["week_number"] = pd.Categorical(
-    df_sian["week_number"], categories=week_order, ordered=True
+df_gtf["week_number"] = pd.Categorical(
+    df_gtf["week_number"], categories=week_order, ordered=True
 )
-df_sian = df_sian.sort_values("week_number")
+df_gtf = df_gtf.sort_values("week_number")
 
-os.makedirs("sian_weekly_outputs", exist_ok=True)
+os.makedirs("gtf_weekly_outputs", exist_ok=True)
 
 for week in week_order:
-    week_df = df_sian[df_sian["week_number"] == week]
+    week_df = df_gtf[df_gtf["week_number"] == week]
     if not week_df.empty:
-        week_df.to_csv(f"sian_weekly_outputs/week_{week}.csv", index=False)
+        week_df.to_csv(f"gtf_weekly_outputs/week_{week}.csv", index=False)
 
-print("Sian weekly output files created.")
+print("GTF weekly output files created.")
