@@ -54,7 +54,7 @@ Contains:
 
 * Selected only relevant columns:
 
-  * week, variety, forecasts, harvests, forecast type
+* week, variety, forecasts, harvests, forecast type
 * Standardized column names (lowercase, stripped spaces)
 * Converted `week_number` to numeric
 
@@ -72,7 +72,7 @@ Weeks were reordered to reflect the **harvest cycle**, not calendar order:
 
 * Ensures proper time series continuity across year boundary
 
----
+-----
 
 ## Step 4 — Weekly Dataset Creation
 
@@ -85,7 +85,7 @@ Output folder:
 sian_weekly_outputs/
 ```
 
----
+-----
 
 ## Step 5 — Error Metric Computation
 
@@ -112,7 +112,7 @@ abs_perc_error × field_harvests
 * Ensures high-volume fields have greater influence
 * Prevents small harvests from distorting results
 
----
+-----
 
 ##  Step 6 — Weekly Unpredictability Ranking
 
@@ -127,7 +127,7 @@ abs_perc_error × field_harvests
 
 * Rank 1 = most unpredictable for that week
 
----
+-----
 
 ## Step 7 — Weekly Top 6 Extraction
 

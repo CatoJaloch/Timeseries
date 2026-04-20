@@ -16,8 +16,7 @@ for file in os.listdir(folder):
         df = pd.read_csv(path)
         df.columns = df.columns.str.strip().str.lower()
 
-        # Extract week number from filename (adjust if your naming differs)
-        # Example assumes: week_1.csv, week_2.csv, etc.
+        # Extract week number from filename 
         week_number = ''.join([c for c in file if c.isdigit()])
         week_number = int(week_number) if week_number else None
 
